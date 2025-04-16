@@ -10,11 +10,30 @@ export default defineConfig({
     setupFiles: ["./vitest.setup.ts"],
     coverage: {
       reporter: ["text", "json", "html"],
+      exclude: [
+        'node_modules/',
+        'dist/',
+        'coverage/',
+        '**/mocks/**',
+        '**/__tests__/**',
+        '**/*.d.ts',
+        'src/lib/utils.ts',
+        'src/app/**',
+        'src/template/**',
+        'src/types/**',
+        'src/components/ui',
+        '.next/**',
+        'next.config.mjs',
+        'playwright.config.ts',
+        'postcss.config.mjs',
+        'tailwind.config.ts',
+        'vitest.config.ts',
+      ],
     },
   },
   resolve: {
     alias: {
-      "@": resolve(__dirname, "./"),
+      "@": resolve(__dirname, "./src"),
     },
   },
 })
