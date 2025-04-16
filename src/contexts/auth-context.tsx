@@ -65,7 +65,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
           setUser(sessionUser)
           setIsAuthenticated(true)
 
-          localStorage.setItem(SESSION_EXPIRY_KEY, TIME_TO_EXPIRY.toString())
+          const newExpiry = Date.now() + TIME_TO_EXPIRY
+          
+          localStorage.setItem(SESSION_EXPIRY_KEY, newExpiry.toString())
         } else {
           logout()
         }
@@ -88,7 +90,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
     const updateSession = () => {
       if (isAuthenticated) {
-        localStorage.setItem(SESSION_EXPIRY_KEY, TIME_TO_EXPIRY.toString())
+        const newExpiry = Date.now() + TIME_TO_EXPIRY
+
+        localStorage.setItem(SESSION_EXPIRY_KEY, newExpiry.toString())
       }
     }
 
@@ -128,9 +132,13 @@ export function AuthProvider({ children }: AuthProviderProps) {
       email: user.email,
     }
 
+    console.log("sessionUser", sessionUser)
+
     secureStore(SESSION_STORAGE_KEY, sessionUser)
 
-    localStorage.setItem(SESSION_EXPIRY_KEY, TIME_TO_EXPIRY.toString())
+    const expiry = Date.now() + TIME_TO_EXPIRY
+
+    localStorage.setItem(SESSION_EXPIRY_KEY, expiry.toString())
 
     setUser(sessionUser)
     setIsAuthenticated(true)
