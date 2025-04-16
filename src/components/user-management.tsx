@@ -140,7 +140,7 @@ export function UserManagement() {
           )}
         </div>
       </CardContent>
-      <CardFooter className="flex justify-between">
+      <CardFooter className="flex justify-between gap-1">
         <Button variant="outline" onClick={() => setUsers([])}>
           <X className="mr-2 h-4 w-4" />
           Limpar Todos
