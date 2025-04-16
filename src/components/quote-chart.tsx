@@ -46,13 +46,13 @@ export function QuoteChart({ quote, history }: QuoteChartProps) {
   const getIcon = () => {
     switch (quote.type) {
       case "currency":
-        return <DollarSign className="h-6 w-6 text-blue-300" />
+        return <DollarSign className="h-6 w-6 text-blue-300" data-testid="quote-icon" />
       case "stock":
-        return <BarChart3 className="h-6 w-6 text-purple-300" />
+        return <BarChart3 className="h-6 w-6 text-purple-300" data-testid="quote-icon" />
       case "crypto":
-        return <Bitcoin className="h-6 w-6 text-yellow-300" />
+        return <Bitcoin className="h-6 w-6 text-yellow-300" data-testid="quote-icon" />
       default:
-        return <DollarSign className="h-6 w-6 text-blue-300" />
+        return <DollarSign className="h-6 w-6 text-blue-300" data-testid="quote-icon" />
     }
   }
 
@@ -199,7 +199,7 @@ export function QuoteChart({ quote, history }: QuoteChartProps) {
       <CardContent>
         <div className="h-[400px] mt-4">
           {history.length > 1 ? (
-            <Line data={data} options={options} ref={chartRef} />
+            <Line data={data} options={options} ref={chartRef} data-testid="chart" />
           ) : (
             <div className="h-full flex items-center justify-center">
               <p className="finance-text">Aguardando dados para o gráfico...</p>
