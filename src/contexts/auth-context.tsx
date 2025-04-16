@@ -1,13 +1,24 @@
 "use client"
 
 import type React from "react"
-
 import { createContext, useContext, useEffect, useState } from "react"
+import { secureStore, secureRetrieve } from "@/lib/crypto"
+
+const USERS_STORAGE_KEY = "finance_app_users_secure"
+const SESSION_STORAGE_KEY = "finance_app_session_secure"
+const SESSION_EXPIRY_KEY = "finance_app_session_expiry"
+
+const TIME_TO_EXPIRY = 30 * 60 * 1000 // 30 minutos
+const TIME_INTERVAL = 60 * 1000 // 1 minuto
 
 interface User {
   id: string
   name: string
   email: string
+}
+
+interface UserWithPassword extends User {
+  password: string
 }
 
 interface AuthContextType {
@@ -28,9 +39,6 @@ const AuthContext = createContext<AuthContextType>({
 
 export const useAuth = () => useContext(AuthContext)
 
-const STORE_KEY_APP_USER = "finance_app_user"
-const STORE_KEY_APP_SESSION_EXPIRY = "finance_app_session_expiry"
-
 interface AuthProviderProps {
   children: React.ReactNode
 }
@@ -42,20 +50,22 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   useEffect(() => {
     const checkAuth = () => {
-      const storedUser = localStorage.getItem(STORE_KEY_APP_USER)
-      const sessionExpiry = localStorage.getItem(STORE_KEY_APP_SESSION_EXPIRY)
+      if (typeof window === "undefined") {
+        setLoading(false)
+        return
+      }
 
-      if (storedUser && sessionExpiry) {
-        const user = JSON.parse(storedUser)
+      const sessionUser = secureRetrieve<User>(SESSION_STORAGE_KEY)
+      const sessionExpiry = localStorage.getItem(SESSION_EXPIRY_KEY)
+
+      if (sessionUser && sessionExpiry) {
         const expiry = Number.parseInt(sessionExpiry)
 
         if (expiry > Date.now()) {
-          setUser(user)
+          setUser(sessionUser)
           setIsAuthenticated(true)
 
-          const newExpiry = Date.now() + 30 * 60 * 1000
-
-          localStorage.setItem(STORE_KEY_APP_SESSION_EXPIRY, newExpiry.toString())
+          localStorage.setItem(SESSION_EXPIRY_KEY, TIME_TO_EXPIRY.toString())
         } else {
           logout()
         }
@@ -66,40 +76,43 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
     checkAuth()
 
-    // Verificar a sessão a cada minuto
     const interval = setInterval(() => {
-      const sessionExpiry = localStorage.getItem(STORE_KEY_APP_SESSION_EXPIRY)
+      if (typeof window === "undefined") return
+
+      const sessionExpiry = localStorage.getItem(SESSION_EXPIRY_KEY)
 
       if (sessionExpiry && Number.parseInt(sessionExpiry) < Date.now()) {
         logout()
       }
-    }, 60 * 1000)
+    }, TIME_INTERVAL)
 
-    // Atualizar a expiração da sessão quando o usuário interagir com a página
     const updateSession = () => {
       if (isAuthenticated) {
-        const newExpiry = Date.now() + 30 * 60 * 1000 // 30 minutos
-        localStorage.setItem(STORE_KEY_APP_SESSION_EXPIRY, newExpiry.toString())
+        localStorage.setItem(SESSION_EXPIRY_KEY, TIME_TO_EXPIRY.toString())
       }
     }
 
-    window.addEventListener("click", updateSession)
-    window.addEventListener("keypress", updateSession)
-    window.addEventListener("scroll", updateSession)
+    if (typeof window !== "undefined") {
+      window.addEventListener("click", updateSession)
+      window.addEventListener("keypress", updateSession)
+      window.addEventListener("scroll", updateSession)
+    }
 
     return () => {
       clearInterval(interval)
-      window.removeEventListener("click", updateSession)
-      window.removeEventListener("keypress", updateSession)
-      window.removeEventListener("scroll", updateSession)
+
+      if (typeof window !== "undefined") {
+        window.removeEventListener("click", updateSession)
+        window.removeEventListener("keypress", updateSession)
+        window.removeEventListener("scroll", updateSession)
+      }
     }
   }, [isAuthenticated])
 
   const login = async (email: string, password: string) => {
-    const usersJson = localStorage.getItem(STORE_KEY_APP_USER)
-    const users = usersJson ? JSON.parse(usersJson) : []
+    const users = secureRetrieve<UserWithPassword[]>(USERS_STORAGE_KEY) || []
 
-    const user = users.find((u: any) => u.email === email)
+    const user = users.find((u) => u.email === email)
 
     if (!user) {
       throw new Error("Usuário não encontrado")
@@ -115,20 +128,18 @@ export function AuthProvider({ children }: AuthProviderProps) {
       email: user.email,
     }
 
-    localStorage.setItem(STORE_KEY_APP_USER, JSON.stringify(sessionUser))
+    secureStore(SESSION_STORAGE_KEY, sessionUser)
 
-    const expiry = Date.now() + 30 * 60 * 1000
-    localStorage.setItem(STORE_KEY_APP_SESSION_EXPIRY, expiry.toString())
+    localStorage.setItem(SESSION_EXPIRY_KEY, TIME_TO_EXPIRY.toString())
 
     setUser(sessionUser)
     setIsAuthenticated(true)
   }
 
   const register = async (name: string, email: string, password: string) => {
-    const usersJson = localStorage.getItem(STORE_KEY_APP_USER)
-    const users = usersJson ? JSON.parse(usersJson) : []
+    const users = secureRetrieve<UserWithPassword[]>(USERS_STORAGE_KEY) || []
 
-    if (users.some((u: any) => u.email === email)) {
+    if (users.some((u) => u.email === email)) {
       throw new Error("Este email já está em uso")
     }
 
@@ -140,15 +151,14 @@ export function AuthProvider({ children }: AuthProviderProps) {
     }
 
     users.push(newUser)
-    localStorage.setItem(STORE_KEY_APP_USER, JSON.stringify(users))
+    secureStore(USERS_STORAGE_KEY, users)
 
     await login(email, password)
   }
 
   const logout = () => {
-    localStorage.removeItem(STORE_KEY_APP_USER)
-    localStorage.removeItem(STORE_KEY_APP_SESSION_EXPIRY)
-
+    localStorage.removeItem(SESSION_EXPIRY_KEY)
+    localStorage.removeItem(SESSION_STORAGE_KEY)
     setUser(null)
     setIsAuthenticated(false)
   }
