@@ -17,7 +17,6 @@ export function DashboardHeader({ username }: DashboardHeaderProps) {
 
   return (
     <header className="bg-slate-800 border-b border-slate-700 py-3 sticky top-0 z-10 shadow-md">
-      {/* Desktop Header */}
       <div className="container mx-auto px-4 hidden md:flex justify-between items-center">
         <div className="flex items-center justify-center gap-2">
           <Image src="/franq-logo.png" alt="Logo da Franq" height={64} width={64} />
@@ -67,7 +66,6 @@ export function DashboardHeader({ username }: DashboardHeaderProps) {
         </div>
       </div>
 
-      {/* Mobile Header */}
       <div className="container mx-auto px-4 flex md:hidden justify-between items-center">
         <div className="flex items-center gap-2">
           <div className="text-lg font-semibold text-blue-300">
