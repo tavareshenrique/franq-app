@@ -8,6 +8,13 @@ export default defineConfig({
     environment: "jsdom",
     globals: true,
     setupFiles: ["./vitest.setup.ts"],
+    exclude: [
+      "**/node_modules/**",
+      "**/__tests__/**",
+      "**/__mocks__/**",
+      "**/e2e/**",
+      "**/playwright.config.ts",
+    ],
     coverage: {
       reporter: ["text", "json", "html"],
       exclude: [
@@ -28,6 +35,7 @@ export default defineConfig({
         'postcss.config.mjs',
         'tailwind.config.ts',
         'vitest.config.ts',
+        'e2e/**/*',
       ],
     },
   },
