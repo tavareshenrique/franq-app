@@ -3,14 +3,6 @@
 import { useRef } from "react"
 
 import { Line } from "react-chartjs-2"
-
-import { ArrowDown, ArrowUp, Bitcoin, BarChart3, DollarSign } from "lucide-react"
-
-import { cn } from "@/lib/utils"
-
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-
-import type { Quote } from "@/types/finance"
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -22,6 +14,14 @@ import {
   Legend,
   Filler,
 } from "chart.js"
+
+import { ArrowDown, ArrowUp, Bitcoin, BarChart3, DollarSign } from "lucide-react"
+
+import { cn } from "@/lib/utils"
+
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+
+import type { Quote } from "@/types/finance"
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler)
 
