@@ -13,7 +13,5 @@ test('should register a user', async ({ page }) => {
 
   await makeUser(page, user);
 
-  await page.waitForURL('**/dashboard', { timeout: 5000 }),
-
   await expect(page.locator('span').filter({ hasText: `Olá, ${user.name}!`})).toBeVisible();
 });

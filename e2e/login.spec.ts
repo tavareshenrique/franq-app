@@ -22,7 +22,5 @@ test('should login a user', async ({ page }) => {
 
   await page.getByRole('button', { name: 'Entrar' }).click();
 
-  await page.waitForURL('**/dashboard', { timeout: 5000 }),
-
   await expect(page.locator('span').filter({ hasText: `Olá, ${user.name}!`})).toBeVisible();
 });

@@ -16,5 +16,8 @@ export async function makeUser(page: Page, user: UserData) {
   await page.getByRole('textbox', { name: 'Senha', exact: true }).fill(user.password);
   await page.getByRole('textbox', { name: 'Confirmar Senha' }).fill(user.password);
 
-  await page.getByRole('button', { name: 'Criar conta' }).click();
+  await Promise.all([
+    page.waitForURL(/\/dashboard/),
+    page.getByRole('button', { name: 'Criar conta' }).click(),
+  ]);
 }

@@ -117,6 +117,7 @@ export function QuotesList({ quotes, onSelectQuote, onToggleFavorite, selectedQu
                   variant="ghost"
                   size="icon"
                   className="absolute top-2 right-2 h-8 w-8 rounded-full bg-slate-700 hover:bg-slate-600"
+                  data-testid={`favorite-button-${quote.id}`}
                   onClick={(e) => {
                     e.stopPropagation()
                     onToggleFavorite(quote.id)

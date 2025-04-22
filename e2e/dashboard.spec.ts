@@ -13,9 +13,7 @@ test('should select a currency', async ({ page }) => {
 
   await makeUser(page, user);
 
-  await page.waitForURL('**/dashboard', { timeout: 5000 })
-
-  await page.getByText('DollarMoedaR$ 5,870.00%Adicionar aos favoritos').click();
+  await page.getByRole('heading', { name: 'Dollar', exact: true }).click();
 
   await expect(page.locator('div').filter({ hasText: /^Dollar$/ })).toBeVisible();
 });
@@ -29,13 +27,11 @@ test('should select a currency and add to favorites', async ({ page }) => {
 
   await makeUser(page, user);
 
-  await page.waitForURL('**/dashboard', { timeout: 5000 })
-
-  await page.getByText('DollarMoedaR$ 5,870.00%Adicionar aos favoritos').click();
+  await page.getByRole('heading', { name: 'Dollar', exact: true }).click();
 
   await expect(page.locator('div').filter({ hasText: /^Dollar$/ })).toBeVisible();
 
-  await page.locator('div').filter({ hasText: /^DollarMoedaR\$ 5,870\.00%Adicionar aos favoritos$/ }).getByRole('button').click();
+  await page.getByTestId('favorite-button-USD').click();
 
   await page.getByRole('button', { name: 'Favoritos', exact: true }).click();
 
